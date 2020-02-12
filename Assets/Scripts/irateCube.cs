@@ -6,10 +6,11 @@ public class irateCube : MonoBehaviour
 {
     public float dFP = 0;
     public float v = 0;
-    public float aggroDis = 0;
-    public float aggroMin = 0;
+    //public float aggroDis = 0;
     public float speed = 0;
     public Vector3 force;
+    public Vector3 aggroMin;
+    public Vector3 aggroDis;
     public Vector3 distance = new Vector3();
     public Vector3 velocity = new Vector3();
     public Vector3 aggroVec = new Vector3();
@@ -24,8 +25,9 @@ public class irateCube : MonoBehaviour
     void Update()
     {
         aggroVec = annoyingThing.transform.position - transform.position;
-        aggroDis = annoyingThing.transform.position.x - transform.position.x;
-        if (Mathf.Abs(aggroVec.x) <= dFP || Mathf.Abs(aggroVec.z) <= dFP &&  Mathf.Abs(aggroDis) > aggroMin)
+        aggroDis.x = Mathf.Abs(annoyingThing.transform.position.x - transform.position.x);
+        aggroDis.z = Mathf.Abs(annoyingThing.transform.position.z - transform.position.z);
+        if ((Mathf.Abs(aggroVec.x) <= dFP || Mathf.Abs(aggroVec.z) <= dFP) &&  (Mathf.Abs(aggroDis.x) > aggroMin.x || Mathf.Abs(aggroDis.z) > aggroMin.z))
         {
             velocity = ((annoyingThing.transform.position - transform.position) * v).normalized;
             force = velocity - distance;
@@ -33,5 +35,6 @@ public class irateCube : MonoBehaviour
             transform.position += (velocity * Time.deltaTime) * speed;
             transform.rotation = Quaternion.LookRotation(velocity);
         }
+
     }
 }
