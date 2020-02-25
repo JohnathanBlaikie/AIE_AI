@@ -10,7 +10,7 @@ public class scaredyCube : MonoBehaviour
     public Vector3 force;
     public Vector3 distance = new Vector3();
     public Vector3 velocity = new Vector3();
-    public GameObject scaryThing = new GameObject();
+    public GameObject scaryThing;
     // Start is called before the first frame update
     void Start()
     {

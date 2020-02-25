@@ -14,7 +14,7 @@ public class irateCube : MonoBehaviour
     public Vector3 distance = new Vector3();
     public Vector3 velocity = new Vector3();
     public Vector3 aggroVec = new Vector3();
-    public GameObject annoyingThing = new GameObject();
+    public GameObject annoyingThing;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +30,7 @@ public class irateCube : MonoBehaviour
         if ((Mathf.Abs(aggroVec.x) <= dFP || Mathf.Abs(aggroVec.z) <= dFP) &&  (Mathf.Abs(aggroDis.x) > aggroMin.x || Mathf.Abs(aggroDis.z) > aggroMin.z))
         {
             velocity = ((annoyingThing.transform.position - transform.position) * v).normalized;
-            force = velocity - distance;
+            force = velocity - aggroDis;
             velocity += force * Time.deltaTime;
             transform.position += (velocity * Time.deltaTime) * speed;
             transform.rotation = Quaternion.LookRotation(velocity);
