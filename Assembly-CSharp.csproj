@@ -63,7 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BearScript.cs" />
+    <Compile Include="Assets\Scripts\DecisionTree.cs" />
     <Compile Include="Assets\Scripts\FlowerScript.cs" />
+    <Compile Include="Assets\Scripts\IDecision.cs" />
     <Compile Include="Assets\Scripts\NavMeshOnClick.cs" />
     <Compile Include="Assets\Scripts\flockScipt.cs" />
     <Compile Include="Assets\Scripts\flockScript2.cs" />
