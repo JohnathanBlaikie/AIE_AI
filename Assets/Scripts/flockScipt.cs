@@ -37,7 +37,7 @@ public class flockScipt : MonoBehaviour
         {
             aggroVec = goal.transform.position - c.transform.position;
             aggroDis.x = Mathf.Abs(goal.transform.position.x - c.transform.position.x);
-            aggroDis.x = Mathf.Abs(goal.transform.position.y - c.transform.position.y);
+            aggroDis.y = Mathf.Abs(goal.transform.position.y - c.transform.position.y);
             aggroDis.z = Mathf.Abs(goal.transform.position.z - c.transform.position.z);
             for (int i = 0; i < flock.Length; i++)
             {
@@ -83,7 +83,6 @@ public class flockScipt : MonoBehaviour
                     forceCorrection = velocityCorrection - flockSep;
                     velocityCorrection += forceCorrection * Time.deltaTime;
                     c.transform.position += (velocityCorrection * Time.deltaTime) * speed;
-
                 }
             }
             if ((Mathf.Abs(aggroVec.x) <= dFP || Mathf.Abs(aggroVec.y) <= dFP || Mathf.Abs(aggroVec.z) <= dFP) &&
