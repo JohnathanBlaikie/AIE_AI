@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class flockScript2 : MonoBehaviour
+public class flockScript3 : MonoBehaviour
 {
     public enum Beehavior { PATROL, CHASE, GATHER };
     public Beehavior bHE;
-    public float dFP, v, aggroMin, personalSpace, isolationAnxiety, speed;
+    public float dFP, v, aggroMin, personalSpace, isolationAnxiety, speed, gardenTime;
     public Vector3 aggroDis;
     public Vector3 force, forceCorrection;
     public Vector3 flockSep = new Vector3();
@@ -33,30 +33,30 @@ public class flockScript2 : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            if (goal == null)
-            {
-                goal = target1;
-            }
-            else if (goal == target1)
-            {
-                goal = target2;
-            }
-            else if (goal == target2)
-            {
-                goal = null;
-            }
-            //if(bHE == Beehavior.PATROL)
+            //if (goal == null)
             //{
-            //    bHE = Beehavior.CHASE;
+            //    goal = target1;
             //}
-            //else if (bHE == Beehavior.CHASE)
+            //else if (goal == target1)
             //{
-            //    bHE = Beehavior.GATHER;
+            //    goal = target2;
             //}
-            //else if (bHE == Beehavior.GATHER)
+            //else if (goal == target2)
             //{
-            //    bHE = Beehavior.PATROL;
+            //    goal = null;
             //}
+            if(bHE == Beehavior.PATROL)
+            {
+                bHE = Beehavior.CHASE;
+            }
+            else if (bHE == Beehavior.CHASE)
+            {
+                bHE = Beehavior.GATHER;
+            }
+            else if (bHE == Beehavior.GATHER)
+            {
+                bHE = Beehavior.PATROL;
+            }
 
 
         }
@@ -140,24 +140,27 @@ public class flockScript2 : MonoBehaviour
         temp.z = Mathf.Abs(a.transform.position.z - b.transform.position.z);
         return temp;
     }
-    //void Gather(Vector3 location)
-    //{
-    //    Patrol(location);
-    //}
-    //void Patrol(Vector3 location)
-    //{
-    //    Vector3 vec3 = ((location - gameObject.transform.position) * speed).normalized;
-    //    Vector3 force = vec3 - velocity;
-    //    velocity += force * Time.deltaTime;
-    //    gameObject.transform.position += velocity * speed * Time.deltaTime;
-    //}
-    //
-    //void Chase(Vector3 target)
-    //{
-    //    Vector3 vec3 = ((target - gameObject.transform.position) * speed).normalized;
-    //    Vector3 force = vec3 - velocity;
-    //    velocity += force * Time.deltaTime;
-    //    gameObject.transform.position += velocity * speed * Time.deltaTime;
-    //}
+    void Gather(Vector3 location)
+    {
+        float tempTimer = 0;
+        Patrol(location);
+        tempTimer += gardenTime + Time.time;
+        
+    }
+    void Patrol(Vector3 location)
+    {
+        Vector3 vec3 = ((location - gameObject.transform.position) * speed).normalized;
+        Vector3 force = vec3 - velocity;
+        velocity += force * Time.deltaTime;
+        gameObject.transform.position += velocity * speed * Time.deltaTime;
+    }
+    
+    void Chase(Vector3 target)
+    {
+        Vector3 vec3 = ((target - gameObject.transform.position) * speed).normalized;
+        Vector3 force = vec3 - velocity;
+        velocity += force * Time.deltaTime;
+        gameObject.transform.position += velocity * speed * Time.deltaTime;
+    }
 
 }

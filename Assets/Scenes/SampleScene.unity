@@ -7711,7 +7711,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cff2242138f0a945ad0e217b292fe32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 963194227}
+  cam: {fileID: 1090219227}
   nMA: {fileID: 1565757038}
 --- !u!136 &1565757033
 CapsuleCollider:
