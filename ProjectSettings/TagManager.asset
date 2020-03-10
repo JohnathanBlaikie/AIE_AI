@@ -7,6 +7,8 @@ TagManager:
   - FlockMember
   - Flower
   - Bee
+  - Node
+  - Bear
   layers:
   - Default
   - TransparentFX
