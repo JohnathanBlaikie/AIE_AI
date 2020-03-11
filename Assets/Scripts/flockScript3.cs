@@ -20,6 +20,7 @@ public class flockScript3 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        goal = target1;
         //foreach (Rigidbody rb in transform)
         //{
         //    flock[flocks] = rb;
@@ -61,20 +62,20 @@ public class flockScript3 : MonoBehaviour
 
         }
 
-        //switch (bHE)
-        //{
-        //    case Beehavior.PATROL:
-        //        Patrol(target1.transform.position);
-        //        break;
-        //    case Beehavior.CHASE:
-        //        Chase(threat.transform.position);
-        //        break;
-        //    case Beehavior.GATHER:
-        //        Patrol(target2.transform.position);
-        //        break;
-        //    default:
-        //        break;
-        //}
+        switch (bHE)
+        {
+            case Beehavior.PATROL:
+                Patrol(target1.transform.position);
+                break;
+            case Beehavior.CHASE:
+                Chase(threat.transform.position);
+                break;
+            case Beehavior.GATHER:
+                Patrol(target2.transform.position);
+                break;
+            default:
+                break;
+        }
 
         foreach (Rigidbody rb in flock)
         {

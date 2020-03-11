@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class DijkstraBearScript : MonoBehaviour
 {
+    public enum BearBrain { GATHER, FLEE, HOLD};
+    public BearBrain bB;
+    public int gC = 0, fC = 0, hC = 0;
     //Dijkstra Stuff
     private NodeScript currentNode;
-    private Vector3 cVelocity;
-
     public NodeScript goalNode;
+    public GameObject gridSpawner;
+    public NodeSpawnScript nSS;
+    private Vector3 cVelocity;
     //Bear Script stuff
     public float dFP = 0, v, aggroMin, beeAlert, personalSpace, speed;
+    public float waitTime, waitFloat, gatherTime, gatherFloat, hideTime, hideFloat;
     public Vector3 aggroDis;
     public Vector3 force, forceCorrection, beeEvasion;
     public Vector3 distance = new Vector3();
@@ -18,42 +23,101 @@ public class DijkstraBearScript : MonoBehaviour
     //public Vector3 velocity = new Vector3();
     //public Vector3 velocityCorrection = new Vector3();
     public Vector3 aggroVec = new Vector3();
-    public GameObject goal, target1, target2;
-    public Rigidbody rb;
+    public GameObject goalGameObject, target1, target2;
+    //public Rigidbody rb;
     public Rigidbody[] BeeSwarm;
 
     public List<NodeScript> goalPath = new List<NodeScript>();
     // Start is called before the first frame update
     void Start()
     {
+        //ClosestPoint(gridSpawner, target1.transform, (nSS.x * nSS.y));
 
     }
 
+    private void Awake()
+    {
+    }
     // Update is called once per frame
     void Update()
     {
-        aggroVec = goal.transform.position - this.transform.position;
-        aggroDis = PosComp(goal.transform, transform);
+        aggroVec = goalGameObject.transform.position - this.transform.position;
+        aggroDis = PosComp(goalGameObject.transform, this.transform);
 
-        for (int i = 0; i < BeeSwarm.Length; i++)
+        switch (bB)
         {
-            beeEvasion = PosComp(rb.transform, BeeSwarm[i].transform);
+            case BearBrain.GATHER:
 
-            if (beeEvasion.x < personalSpace && beeEvasion.y < personalSpace && beeEvasion.z < personalSpace)
-            {
-                goalNode = 
-                //velocityCorrection = ((rb.transform.position - BeeSwarm[i].transform.position) * v).normalized;
-                //forceCorrection = velocityCorrection - beeEvasion;
-                //velocityCorrection += forceCorrection * Time.deltaTime;
-                //rb.AddForce((velocityCorrection * Time.deltaTime) * speed * 1.5f);
-
-            }
-            else if(beeEvasion.x < beeAlert && beeEvasion.y < beeAlert && beeEvasion.z < beeAlert)
-            {
-                goalNode = null;
-            }
-            else goalNode = 
+                goalGameObject = target1;
+                if (gC == 0)
+                {
+                    goalNode = ClosestPoint(gridSpawner, target1.transform, nSS.x * nSS.y);
+                    FindPath();
+                }
+                for (int i = 0; i < BeeSwarm.Length; i++)
+                {
+                    beeEvasion = PosComp(transform, BeeSwarm[i].transform);
+                    if (beeEvasion.x < beeAlert &&
+                        beeEvasion.y < beeAlert &&
+                        beeEvasion.z < beeAlert)
+                    {
+                        hC = 0;
+                        waitTime = waitFloat + Time.time;
+                        bB = BearBrain.HOLD;
+                    }
+                }
+                if (gC > 400)
+                {
+                    gC = 0;
+                }
+                gC++;
+                // goalNode = ClosestPoint(gridSpawner, goal.transform, (nSS.x * nSS.y));
+                break;
+            case BearBrain.HOLD:
+                //goalGameObject = null;
+                if(hC == 0)
+                {
+                    goalNode = ClosestPoint(gridSpawner, transform, nSS.x * nSS.y);
+                    FindPath();
+                }
+                if (beeEvasion.x < personalSpace &&
+                   beeEvasion.y < personalSpace &&
+                   beeEvasion.z < personalSpace)
+                {
+                    fC = 0;
+                    hideTime = hideFloat + Time.time;
+                    bB = BearBrain.FLEE;
+                    //goalNode = ClosestPoint(gridSpawner, target2.transform, nSS.x * nSS.y);
+                }
+                else if (waitTime <= Time.time && beeAlert > personalSpace)
+                {
+                    gC = 0;
+                    bB = BearBrain.GATHER;
+                }
+                hC++;
+                break;
+            case BearBrain.FLEE:
+                goalGameObject = target2;
+                if (fC == 0)
+                {
+                    goalNode = ClosestPoint(gridSpawner, target2.transform, nSS.x * nSS.y);
+                    FindPath();
+                }
+                if (hideTime <= Time.time)
+                {
+                    gC = 0;
+                    bB = BearBrain.GATHER;
+                }
+                if(fC > 200)
+                {
+                    fC = 0;
+                }
+                fC++;
+                break;
+            //default:
         }
+
+       
 
         if (Input.GetKeyDown(KeyCode.P))
         {
@@ -61,10 +125,21 @@ public class DijkstraBearScript : MonoBehaviour
         }
         if (goalPath.Count > 0)
         {
-            Vector3 v3 = ((goalPath[0].gameObject.transform.position - transform.position) * speed).normalized;
+            Vector3 v3 = ((goalPath[0].gameObject.transform.position - transform.position)).normalized;
             Vector3 force = v3 - cVelocity;
             cVelocity += force * Time.deltaTime;
-            transform.position += cVelocity * Time.deltaTime;
+            
+            transform.position += cVelocity * speed * Time.deltaTime;
+            // transform.position = goalPath[0].gameObject.transform.position;
+
+            // check if at destination here
+            //insert ontrigger code here
+
+            //if (currentNode == goalPath[0])
+            //{
+            //    goalPath.Remove(currentNode);
+            //}
+           
         }
     }
 
@@ -137,7 +212,23 @@ public class DijkstraBearScript : MonoBehaviour
         {
             NodeScript cNode = collision.gameObject.GetComponent<NodeScript>();
             currentNode = cNode;
-
+    
+            if (goalPath.Count > 0)
+            {
+                if (cNode == goalPath[0])
+                {
+                    goalPath.Remove(cNode);
+                }
+            }
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Node"))
+        {
+            NodeScript cNode = other.gameObject.GetComponent<NodeScript>();
+            currentNode = cNode;
+    
             if (goalPath.Count > 0)
             {
                 if (cNode == goalPath[0])
@@ -174,7 +265,7 @@ public class DijkstraBearScript : MonoBehaviour
             Gizmos.DrawSphere(new Vector3(
                 goalNode.gameObject.transform.position.x,
                 goalNode.gameObject.transform.position.y,
-                goalNode.gameObject.transform.position.z), 2f);
+                goalNode.gameObject.transform.position.z), 0.2f);
 
         }
 
@@ -193,7 +284,7 @@ public class DijkstraBearScript : MonoBehaviour
             Gizmos.DrawSphere(new Vector3(
                 currentNode.gameObject.transform.position.x,
                 currentNode.gameObject.transform.position.y,
-                currentNode.gameObject.transform.position.z), 2f);
+                currentNode.gameObject.transform.position.z), 0.2f);
         }
     }
     public Vector3 PosComp(Transform a, Transform b)
@@ -202,7 +293,41 @@ public class DijkstraBearScript : MonoBehaviour
         temp.x = Mathf.Abs(a.transform.position.x - b.transform.position.x);
         temp.y = Mathf.Abs(a.transform.position.y - b.transform.position.y);
         temp.z = Mathf.Abs(a.transform.position.z - b.transform.position.z);
+        //Vector3.Distance(a.transform.position, b.transform.position);
+
         return temp;
+    }
+    
+    public NodeScript ClosestPoint(GameObject spawner, Transform tempGoal, int totalNodes)
+    {
+
+        NodeScript[] nodeLoc = new NodeScript[totalNodes];
+        int counter = 0;
+        float dis = 0;
+        NodeScript closestNode = new NodeScript();
+        foreach(NodeScript tf in spawner.GetComponentsInChildren<NodeScript>())
+        {
+            //Vector3.Distance(nodeLoc[counter].transform, )
+            nodeLoc[counter] = tf;
+            counter++;
+        }
+        for(int i = 0; i < totalNodes; i++)
+        {
+            float tempDis;
+            if(i == 0)
+            dis = Vector3.Distance(nodeLoc[i].transform.position, tempGoal.position);
+            else
+            {
+                tempDis = Vector3.Distance(nodeLoc[i].transform.position, tempGoal.position);
+                if(tempDis < dis)
+                {
+                    closestNode = nodeLoc[i];
+                    dis = tempDis;
+                }
+            }
+        }
+    
+        return closestNode;
     }
 }
 

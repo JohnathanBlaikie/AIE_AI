@@ -6,7 +6,8 @@ public class flockScript2 : MonoBehaviour
 {
     public enum Beehavior { PATROL, CHASE, GATHER };
     public Beehavior bHE;
-    public float dFP, v, aggroMin, personalSpace, isolationAnxiety, speed;
+    public float dFP, v, aggroMin, personalSpace, isolationAnxiety, speed, callOffPursuit;
+    public float patrolTimer, patrolFloat, gatherTimer, gatherFloat;
     public Vector3 aggroDis;
     public Vector3 force, forceCorrection;
     public Vector3 flockSep = new Vector3();
@@ -16,10 +17,12 @@ public class flockScript2 : MonoBehaviour
     public Vector3 aggroVec = new Vector3();
     public GameObject goal, target1, target2, threat;
 
+    public Time timer;
     public Rigidbody[] flock = new Rigidbody[6];
     // Start is called before the first frame update
     void Start()
     {
+        patrolTimer += patrolFloat;
         //foreach (Rigidbody rb in transform)
         //{
         //    flock[flocks] = rb;
@@ -31,50 +34,61 @@ public class flockScript2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log(Time.time);
+
         if (Input.GetKeyDown(KeyCode.T))
         {
-            if (goal == null)
+            
+            if(bHE == Beehavior.PATROL)
             {
-                goal = target1;
+                bHE = Beehavior.CHASE;
             }
-            else if (goal == target1)
+            else if (bHE == Beehavior.CHASE)
             {
-                goal = target2;
+                bHE = Beehavior.GATHER;
             }
-            else if (goal == target2)
+            else if (bHE == Beehavior.GATHER)
             {
-                goal = null;
+                bHE = Beehavior.PATROL;
             }
-            //if(bHE == Beehavior.PATROL)
-            //{
-            //    bHE = Beehavior.CHASE;
-            //}
-            //else if (bHE == Beehavior.CHASE)
-            //{
-            //    bHE = Beehavior.GATHER;
-            //}
-            //else if (bHE == Beehavior.GATHER)
-            //{
-            //    bHE = Beehavior.PATROL;
-            //}
 
 
         }
 
-        //switch (bHE)
-        //{
-        //    case Beehavior.PATROL:
-        //        Patrol(target1.transform.position);
-        //        break;
-        //    case Beehavior.CHASE:
-        //        Chase(threat.transform.position);
-        //        break;
-        //    case Beehavior.GATHER:
-        //        Patrol(target2.transform.position);
-        //        break;
-        //    default:
-        //        break;
-        //}
+        switch (bHE)
+        {
+            case Beehavior.PATROL:
+                goal = target1;
+                if (patrolTimer <= Time.time)
+                {
+                    gatherTimer = gatherFloat + Time.time;
+                    bHE = Beehavior.GATHER;
+                }
+                else if(patrolTimer >= Time.time
+            && callOffPursuit >= Vector3.Distance(target1.transform.position, threat.transform.position))
+                {
+                    bHE = Beehavior.CHASE;
+                }
+                break;
+            case Beehavior.CHASE:
+                goal = threat;
+                if(callOffPursuit <= Vector3.Distance(target1.transform.position, threat.transform.position))
+                    {
+                    patrolTimer = patrolFloat + Time.time;
+                    bHE = Beehavior.PATROL;
+                }
+                break;
+            case Beehavior.GATHER:
+                goal = target2;
+                if(gatherTimer <= Time.time)
+                {
+                    patrolTimer = patrolFloat + Time.time;
+                    bHE = Beehavior.PATROL;
+                }
+                break;
+            default:
+                break;
+        }
 
         foreach (Rigidbody rb in flock)
         {

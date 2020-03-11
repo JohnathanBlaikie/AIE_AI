@@ -18,7 +18,7 @@ public class NodeSpawnScript : MonoBehaviour
         {
             for(int j = 0; j < y; j++)
             {
-                grid[i, j] = Instantiate(pNode, new Vector3(i, 0, j), Quaternion.identity).GetComponent<NodeScript>();
+                grid[i, j] = Instantiate(pNode, new Vector3(i , 0, j), Quaternion.identity, gameObject.transform).GetComponent<NodeScript>();
             }
         }
 

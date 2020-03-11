@@ -96,11 +96,27 @@ public class DijkstraTest : MonoBehaviour
         }
     }
     
-    private void OnCollisionEnter(Collision collision)
+   // private void OnCollisionEnter(Collision collision)
+   // {
+   //     if (collision.gameObject.CompareTag("Node"))
+   //     {
+   //         NodeScript cNode = collision.gameObject.GetComponent<NodeScript>();
+   //         currentNode = cNode;
+   //
+   //         if (goalPath.Count > 0)
+   //         {
+   //             if (cNode == goalPath[0])
+   //             {
+   //                 goalPath.Remove(cNode);
+   //             }
+   //         }
+   //     }
+   // }
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Node"))
+        if (other.gameObject.CompareTag("Node"))
         {
-            NodeScript cNode = collision.gameObject.GetComponent<NodeScript>();
+            NodeScript cNode = other.gameObject.GetComponent<NodeScript>();
             currentNode = cNode;
 
             if (goalPath.Count > 0)
